@@ -1,0 +1,8 @@
+names:
+  0: bubble
+  1: sfx_text
+  2: background_text
+path: C:\Users\Mike\Desktop\Manga Translate\data
+test: test/images
+train: train/images
+val: val/images

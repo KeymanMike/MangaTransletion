@@ -12,3 +12,5 @@ accelerate>=0.20.0
 huggingface_hub>=0.17.0
 craft-text-detector>=0.4.0
 simple-lama-inpainting>=0.1.0
+yaml
+cv2

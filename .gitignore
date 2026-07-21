@@ -6,9 +6,13 @@ yolov8s-seg.pt
 Встреча_в_Телемосте_13_06_26_19_03_38_—_запись.webm
 манга_dls.pdf
 
+
+#Архивы
+dataset/MANGA Polygon COCO.zip
+
+
 # Папки, которые не нужно версионировать
 .ipynb_checkpoints/
-dataset/
 image/
 Manga/
 runs/

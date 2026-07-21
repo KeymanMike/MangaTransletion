@@ -10,6 +10,7 @@ transformers>=4.35.0
 sentencepiece>=0.1.99
 accelerate>=0.20.0
 huggingface_hub>=0.17.0
+craft-text-detector>=0.4.0
 simple-lama-inpainting>=0.1.0
 gradio>=4.0.0
 websockets==11.0.3

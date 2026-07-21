@@ -11,7 +11,13 @@ from manga_translator import MangaTranslator
 from manga_inpainter import MangaInpainter
 from manga_text_inserter import MangaTextInserter
 
-PATH_TO_IMAGE = r'./dataset/image/One Piece (41).jpg'
+import sys
+
+if len(sys.argv) > 1:
+    PATH_TO_IMAGE = sys.argv[1]
+else:
+    PATH_TO_IMAGE = r'./dataset/image/One Piece (41).jpg'
+
 IMG_FOLDER = r'./dataset/image'
 
 class MangaTranslationPipeline:

@@ -1,4 +1,4 @@
-# Автоматический перевод манги с английского на русский.  
+# Автоматический перевод манги с английского на русский (не финал).  
 Colab:  [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1KW5X4WAyQtOXAkccVQ6UJ4lgM7vMB2l5?usp=sharing) 
 
 Проект выполняет полный цикл: детекция пузырей, OCR, перевод, удаление оригинального текста и вставка перевода.

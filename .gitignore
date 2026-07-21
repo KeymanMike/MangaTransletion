@@ -13,8 +13,9 @@ dataset/MANGA Polygon COCO.zip
 
 # Папки, которые не нужно версионировать
 .ipynb_checkpoints/
+.idea/
 image/
 Manga/
 runs/
 yolo_labels/
-
+Translation/

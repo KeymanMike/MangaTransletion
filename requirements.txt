@@ -14,3 +14,4 @@ craft-text-detector>=0.4.0
 simple-lama-inpainting>=0.1.0
 yaml
 cv2
+gradio>=6.20

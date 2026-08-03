@@ -64,7 +64,8 @@ class MangaTranslationPipeline:
         self.detector.save('manga_detector.pt')
         print("✅ Детектор обучен и сохранён в manga_detector.pt")
 
-    def process_image(self, image_path: str, conf: float = 0.25, save_visualization: bool = False) -> np.ndarray:
+    def process_image(self, image_path: str, conf: float = 0.25, save_visualization: bool = False, max_font_size: int = None,
+                  font_path: str = None, return_details=False) -> np.ndarray:
         """
         Обрабатывает одно изображение и возвращает финальную картинку.
         """
@@ -85,8 +86,11 @@ class MangaTranslationPipeline:
         print("🎨 Удаление текста...")
         clean_image = self.inpainter.inpaint_page(predictions['image'], predictions['objects'])
 
+        if font_path is not None:
+            self.inserter.set_font_path(font_path)
+
         print("📝 Вставка перевода...")
-        final_image = self.inserter.insert_text(clean_image, predictions['objects'], translated_blocks)
+        final_image = self.inserter.insert_text(clean_image, predictions['objects'], translated_blocks, max_font_size=max_font_size)
 
         out_name = image_path.stem + "_translated" + image_path.suffix
         out_path = self.output_dir / out_name
@@ -96,7 +100,22 @@ class MangaTranslationPipeline:
         if save_visualization:
             self._visualize(predictions['image'], final_image, image_path.name)
 
+        if return_details:
+            return final_image, clean_image, text_blocks, translated_blocks, predictions['objects']
+
         return final_image
+
+    def apply_corrections(self, clean_image, objects, translated_blocks,
+                          max_font_size=None, font_path=None):
+        """
+        Принимает очищенное изображение и список переводов (уже исправленных),
+        возвращает новое изображение с вставленным текстом.
+        """
+        if font_path:
+            self.inserter.set_font_path(font_path)
+        final = self.inserter.insert_text(clean_image, objects, translated_blocks,
+                                          max_font_size=max_font_size)
+        return final
 
     def process_folder(self, folder_path: str, conf: float = 0.25,
                        extensions: tuple = ('.jpg', '.jpeg', '.png', '.webp')) -> List[Path]:

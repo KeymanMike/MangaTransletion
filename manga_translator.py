@@ -5,7 +5,7 @@ import torch
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 
 from manga_detector import MangaBubbleDetector
-from manga_ocr import MangaOCR
+from manga_ocr_many_lang import MyMangaOCR
 
 
 class MangaTranslator:
@@ -20,9 +20,15 @@ class MangaTranslator:
     Каждый текст разбивается на предложения, переводится отдельно и собирается обратно.
     """
 
+    LANG_CODES = {
+        'en': 'eng_Latn',
+        'ja': 'jpn_Jpan',
+        'ru': 'rus_Cyrl',
+    }
+
     def __init__(self, source_lang: str = 'en', target_lang: str = 'ru'):
-        self.source_lang = source_lang
-        self.target_lang = target_lang
+        self.source_lang = source_lang.lower()
+        self.target_lang = target_lang.lower()
 
         model_name = "facebook/nllb-200-1.3B"
         print(f"🌐 NLLB-200-1.3B: {source_lang} → {target_lang}")
@@ -40,8 +46,8 @@ class MangaTranslator:
         else:
             print("   ✅ CPU (fp32)")
 
-        self.src_code = "eng_Latn"
-        self.tgt_code = "rus_Cyrl"
+        self.src_code = self.LANG_CODES.get(self.source_lang, 'eng_Latn')
+        self.tgt_code = self.LANG_CODES.get(self.target_lang, 'rus_Cyrl')
 
     def _get_tgt_token_id(self) -> int:
         tid = self.tokenizer.convert_tokens_to_ids(self.tgt_code)
@@ -50,6 +56,9 @@ class MangaTranslator:
         for token, token_id in self.tokenizer.get_added_vocab().items():
             if token == self.tgt_code:
                 return token_id
+        if hasattr(self.tokenizer, 'lang_code_to_id'):
+            return self.tokenizer.lang_code_to_id.get(self.tgt_code, self.tokenizer.unk_token_id)
+
         return self.tokenizer.unk_token_id
 
     def _remove_artifacts(self, text: str) -> str:
@@ -63,6 +72,7 @@ class MangaTranslator:
             if len(prefix) <= 2 and word.lower().startswith(prefix.lower()):
                 return word
             return m.group(0)
+
         return re.sub(r'\b([A-Za-z]{1,2})-([A-Za-z]{3,})', _stutter_repl, text)
 
     def _fix_hyphenation(self, text: str) -> str:
@@ -97,6 +107,15 @@ class MangaTranslator:
             return text + '.'
 
     def _preprocess(self, text: str) -> str:
+        if not text:
+            return text
+
+        if self.source_lang == 'ja':
+            text = text.replace('_', ' ')
+            text = re.sub(r'[|\[\]{}<>]', ' ', text)
+            text = re.sub(r'\s+', ' ', text).strip()
+            return text
+
         text = self._remove_artifacts(text)
         text = self._fix_stuttering(text)
         text = self._fix_hyphenation(text)
@@ -105,9 +124,11 @@ class MangaTranslator:
         text = re.sub(r'\s+', ' ', text).strip()
         return text
 
-
     def _split_into_sentences(self, text: str) -> list[str]:
         """Разбивает текст на предложения по .?! и возвращает список строк."""
+        if self.source_lang == 'ja':
+            return [text.strip()] if text.strip() else []
+
         sentences = re.split(r'(?<=[.?!])\s+', text)
         return [s.strip() for s in sentences if s.strip()]
 
@@ -228,7 +249,7 @@ def process_page(detector, ocr, translator, image_path, conf=0.25):
 if __name__ == "__main__":
     detector = MangaBubbleDetector(model_size='small')
     detector.load(r'./model/manga_detector.pt')
-    ocr = MangaOCR()
+    ocr = MyMangaOCR()
     translator = MangaTranslator(source_lang='en', target_lang='ru')
 
     results = process_page(detector, ocr, translator, r'./dataset/image/One Piece (41).jpg')

@@ -14,3 +14,4 @@ gradio>=4.0.0
 websockets==11.0.3
 uvicorn==0.22.0
 pandas==2.3.3
+manga-ocr==0.1.16

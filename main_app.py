@@ -6,7 +6,7 @@ from typing import List
 import matplotlib.pyplot as plt
 
 from manga_detector import MangaBubbleDetector, MangaDataset
-from manga_ocr import MangaOCR
+from manga_ocr_many_lang import MyMangaOCR
 from manga_translator import MangaTranslator
 from manga_inpainter import MangaInpainter
 from manga_text_inserter import MangaTextInserter
@@ -45,7 +45,7 @@ class MangaTranslationPipeline:
         else:
             print("⚠️ Веса детектора не найдены. Сначала запустите обучение.")
 
-        self.ocr = MangaOCR()
+        self.ocr = MyMangaOCR(language=ocr_lang)
         self.translator = MangaTranslator(source_lang=translator_src, target_lang=translator_tgt)
         self.inpainter = MangaInpainter()
         self.inserter = MangaTextInserter(font_path=font_path, outline_width=2)

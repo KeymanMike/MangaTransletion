@@ -6,7 +6,7 @@ from typing import List, Tuple,Optional
 from PIL import Image, ImageDraw, ImageFont
 
 from manga_detector import MangaBubbleDetector
-from manga_ocr import MangaOCR
+from manga_ocr_many_lang import MyMangaOCR
 from manga_inpainter import MangaInpainter
 from manga_translator import MangaTranslator
 
@@ -536,7 +536,7 @@ if __name__ == '__main__':
     detector.load(r'./model/manga_detector.pt')
     predictions = detector.predict(PATH_TO_IMAGE, conf=0.25)
 
-    ocr = MangaOCR()
+    ocr = MyMangaOCR()
     translator = MangaTranslator(source_lang='en', target_lang='ru')
     text_blocks = ocr.extract_all_text(predictions['image'], predictions['objects'])
     translated_blocks = translator.translate_blocks(text_blocks)
